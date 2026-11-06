@@ -1,0 +1,59 @@
+name: Build and Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+# Grant permissions to write to GitHub Pages
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Package Behavior Pack
+        run: |
+          mkdir release
+          # Zip the required files into a Minecraft Pack format
+          zip -r release/InstantFarm_BP.mcpack manifest.json scripts/
+          
+      - name: Generate Download Page
+        run: |
+          # Create a simple, mobile-friendly HTML page for your phone
+          cat << 'EOF' > release/index.html
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Pack Download</title>
+            </head>
+            <body style="font-family: sans-serif; padding: 2rem; text-align: center; background: #121212; color: white;">
+              <h1>Instant Farm BP</h1>
+              <p>Tap below to download and install on Minecraft PE.</p>
+              <br>
+              <a href="InstantFarm_BP.mcpack" style="padding: 1rem 2rem; background: #007bff; color: white; text-decoration: none; border-radius: 8px; font-size: 1.2rem; display: inline-block;">Download .mcpack</a>
+            </body>
+          </html>
+          EOF
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./release

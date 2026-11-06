@@ -1,0 +1,15 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+
+# Build artifacts
+scripts/
+build_output/
+public_html/
+*.mcpack
+*.zip
+
+# IDE and OS files
+.vscode/
+.DS_Store
+Thumbs.db

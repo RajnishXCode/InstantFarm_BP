@@ -1,0 +1,16 @@
+{
+  "name": "instant-farm-bp",
+  "version": "1.0.0",
+  "private": true,
+  "main": "scripts/main.js",
+  "scripts": {
+    "build": "esbuild src/main.ts --outfile=scripts/main.js --bundle --format=esm --external:@minecraft/server"
+  },
+  "dependencies": {
+    "@minecraft/server": "^1.11.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0",
+    "typescript": "^5.0.0"
+  }
+}
