@@ -2,7 +2,7 @@
   "format_version": 2,
   "header": {
     "name": "Instant Farm BP",
-    "description": "Auto-growing crops test and CI/CD pipeline.",
+    "description": "Auto-growing crops and trees.",
     "uuid": "9c662411-f8f1-481d-8ad1-59b71c909d26",
     "version": [1, 0, 1],
     "min_engine_version": [1, 20, 0]
