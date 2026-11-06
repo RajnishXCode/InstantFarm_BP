@@ -72,12 +72,23 @@ world.afterEvents.playerPlaceBlock.subscribe((event) => {
         const featureName = TREE_FEATURES[typeId];
         const { x, y, z } = block.location;
 
+        // Tick 1: Remove the sapling to clear the space
         system.run(() => {
-            // Remove the sapling first
             block.setType("minecraft:air");
             
-            // Generate the specific tree based on the dictionary mapping
-            dimension.runCommand(`place feature ${featureName} ${x} ${y} ${z}`);
+            // Tick 2: Wait one additional game tick for the world to register the air block
+            system.run(() => {
+                try {
+                    // Attempt to generate the tree feature
+                    dimension.runCommand(`place feature ${featureName} ${x} ${y} ${z}`);
+                } catch (error) {
+                    // If the command fails (e.g., obstructed by a roof or other blocks),
+                    // the code falls back here and safely returns the sapling to the ground.
+                    block.setType(typeId);
+                }
+            });
         });
     }
+
+
 });
