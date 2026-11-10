@@ -1,0 +1,40 @@
+
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "instantfarm:ore_detector"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "CAC",
+      "RPR",
+      " C "
+    ],
+    "key": {
+      "C": {
+        "item": "minecraft:copper_ingot"
+      },
+      "A": {
+        "item": "minecraft:amethyst_shard"
+      },
+      "R": {
+        "item": "minecraft:redstone"
+      },
+      "P": {
+        "item": "minecraft:compass"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:compass"
+      }
+    ],
+    "result": {
+      "item": "instantfarm:ore_detector",
+      "count": 1
+    }
+  }
+}

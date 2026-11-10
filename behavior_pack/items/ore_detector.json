@@ -1,0 +1,22 @@
+
+{
+  "format_version": "1.20.20",
+  "minecraft:item": {
+    "description": {
+      "identifier": "instantfarm:ore_detector",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "item.instantfarm:ore_detector.name"
+      },
+      "minecraft:icon": {
+        "texture": "instantfarm:ore_detector"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true
+    }
+  }
+}

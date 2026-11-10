@@ -2,7 +2,8 @@
 import {
     world,
     system,
-    type Player
+    type Player,
+    type EntityInventoryComponent
 } from "@minecraft/server";
 
 import { RADAR_CONFIG } from "./config";
@@ -13,10 +14,28 @@ const ORE_DETECTOR_ID = "instantfarm:ore_detector";
 
 const activePlayers = new Map<string, number>();
 
-function displayRadar(
-    player: Player
-): void {
+function isOreDetectorSelected(player: Player): boolean {
+    try {
+        const inventory = player.getComponent(
+            "minecraft:inventory"
+        ) as EntityInventoryComponent | undefined;
 
+        if (!inventory?.container) return false;
+
+        const selectedItem = inventory.container.getItem(
+            player.selectedSlotIndex
+        );
+
+        return selectedItem?.typeId === ORE_DETECTOR_ID;
+    } catch (error) {
+        console.warn(
+            `[OreRadar] Inventory check failed: ${String(error)}`
+        );
+        return false;
+    }
+}
+
+function displayRadar(player: Player): void {
     const targets = scanNearbyOres(
         player.dimension,
         player.location
@@ -32,7 +51,6 @@ function displayRadar(
     const yaw = player.getRotation().y;
 
     const results = targets.map(target => {
-
         const bearing = calculateBearing(
             player.location,
             target.location,
@@ -50,53 +68,14 @@ function displayRadar(
 }
 
 export function initialize(): void {
-
-    // Activate or deactivate the radar using the Ore Detector.
-    world.afterEvents.itemUse.subscribe(event => {
-
-        const player = event.source;
-
-        if (player.typeId !== "minecraft:player") return;
-
-        if (event.itemStack.typeId !== ORE_DETECTOR_ID) {
-            return;
-        }
-
-        const playerEntity = player as Player;
-
-        if (activePlayers.has(playerEntity.id)) {
-
-            activePlayers.delete(playerEntity.id);
-
-            playerEntity.onScreenDisplay.setActionBar("");
-
-            playerEntity.sendMessage(
-                "§7[Ore Radar] Radar deactivated."
-            );
-
-            return;
-        }
-
-        activePlayers.set(
-            playerEntity.id,
-            -RADAR_CONFIG.scanIntervalTicks
-        );
-
-        playerEntity.sendMessage(
-            "§a[Ore Radar] Radar activated."
-        );
-    });
-
-    // Check active players every 10 ticks.
     system.runInterval(() => {
-
         const players = world.getPlayers();
 
         const onlineIds = new Set(
             players.map(player => player.id)
         );
 
-        // Remove players who have left the world.
+        // Remove disconnected players.
         for (const playerId of activePlayers.keys()) {
             if (!onlineIds.has(playerId)) {
                 activePlayers.delete(playerId);
@@ -104,10 +83,30 @@ export function initialize(): void {
         }
 
         for (const player of players) {
+            const detectorSelected = isOreDetectorSelected(player);
+            const wasActive = activePlayers.has(player.id);
 
-            if (!activePlayers.has(player.id)) {
+            // Detector was selected.
+            if (detectorSelected && !wasActive) {
+                activePlayers.set(
+                    player.id,
+                    system.currentTick - RADAR_CONFIG.scanIntervalTicks
+                );
+
+                player.sendMessage("§a[Ore Radar] Radar activated.");
+            }
+
+            // Player switched to another item.
+            if (!detectorSelected && wasActive) {
+                activePlayers.delete(player.id);
+
+                player.onScreenDisplay.setActionBar("");
+
+                player.sendMessage("§7[Ore Radar] Radar deactivated.");
                 continue;
             }
+
+            if (!detectorSelected) continue;
 
             const lastScan = activePlayers.get(player.id)!;
 
@@ -118,10 +117,7 @@ export function initialize(): void {
                 continue;
             }
 
-            activePlayers.set(
-                player.id,
-                system.currentTick
-            );
+            activePlayers.set(player.id, system.currentTick);
 
             try {
                 displayRadar(player);
@@ -131,8 +127,7 @@ export function initialize(): void {
                 );
             }
         }
+    }, 5);
 
-    }, 10);
-
-    console.warn("[OreRadar] Feature initialized.");
+    console.warn("[OreRadar] Held-item controller initialized.");
 }
