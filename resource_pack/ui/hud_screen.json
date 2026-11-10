@@ -2,20 +2,21 @@
 {
   "namespace": "hud",
 
-  "hud_actionbar_text": {
+  "ore_radar_panel": {
     "type": "image",
     "texture": "textures/ui/hud_tip_text_background",
     "size": [220, 112],
     "anchor_from": "top_right",
     "anchor_to": "top_right",
     "offset": [-12, 12],
-    "alpha": 0.88,
+    "alpha": 0.9,
+    "layer": 40,
 
     "controls": [
       {
         "radar_title": {
           "type": "label",
-          "text": "◉ ORE DETECTOR",
+          "text": "ORE RADAR",
           "font_size": "small",
           "color": "#55FFAA",
           "shadow": true,
@@ -49,6 +50,30 @@
           "anchor_to": "top_left",
           "offset": [10, 34]
         }
+      }
+    ]
+  },
+
+  "ore_radar_factory": {
+    "type": "panel",
+    "factory": {
+      "name": "hud_actionbar_text_factory",
+      "control_ids": {
+        "hud_actionbar_text": "ore_radar_panel@hud.ore_radar_panel"
+      }
+    }
+  },
+
+  "root_panel": {
+    "modifications": [
+      {
+        "array_name": "controls",
+        "operation": "insert_front",
+        "value": [
+          {
+            "ore_radar_factory@hud.ore_radar_factory": {}
+          }
+        ]
       }
     ]
   }
