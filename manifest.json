@@ -2,9 +2,9 @@
   "format_version": 2,
   "header": {
     "name": "Instant Farm BP",
-    "description": "Auto-growing crops and trees.",
+    "description": "A simple Minecraft Bedrock Edition behavior pack that adds an instant farm feature. Developed by O.G. RUDRANSH TRIPATHI JI.",
     "uuid": "9c662411-f8f1-481d-8ad1-59b71c909d26",
-    "version": [1, 0, 1],
+    "version": [1, 0, 0],
     "min_engine_version": [1, 20, 0]
   },
   "modules": [

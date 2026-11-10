@@ -7,7 +7,7 @@
     "build": "esbuild src/main.ts --outfile=scripts/main.js --bundle --format=esm --external:@minecraft/server"
   },
   "dependencies": {
-    "@minecraft/server": "^1.11.0"
+    "@minecraft/server": "^2.11.0"
   },
   "devDependencies": {
     "esbuild": "^0.20.0",
