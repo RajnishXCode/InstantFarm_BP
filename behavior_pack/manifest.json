@@ -1,10 +1,11 @@
+
 {
   "format_version": 2,
   "header": {
     "name": "Instant Farm BP",
-    "description": "A simple Minecraft Bedrock Edition behavior pack that adds an instant farm feature. Developed by O.G. RUDRANSH TRIPATHI JI.",
+    "description": "Vanilla+ survival enhancements including instant crop growth, instant tree generation and ore detection.",
     "uuid": "9c662411-f8f1-481d-8ad1-59b71c909d26",
-    "version": [1, 0, 0],
+    "version": [1, 1, 0],
     "min_engine_version": [1, 20, 0]
   },
   "modules": [
@@ -12,14 +13,18 @@
       "type": "script",
       "language": "javascript",
       "uuid": "130f82fa-d7d6-41f8-b938-8be5df941d8a",
-      "version": [1, 0, 0],
+      "version": [1, 1, 0],
       "entry": "scripts/main.js"
     }
   ],
   "dependencies": [
     {
       "module_name": "@minecraft/server",
-      "version": "1.11.0"
+      "version": "2.11.0"
+    },
+    {
+      "uuid": "7b3a2d91-6f40-4c82-9e15-a8d72b31c604",
+      "version": [1, 1, 0]
     }
   ]
 }

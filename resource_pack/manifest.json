@@ -1,0 +1,18 @@
+
+{
+  "format_version": 2,
+  "header": {
+    "name": "Instant Farm RP",
+    "description": "Visual assets and interface resources for the Vanilla+ Enhancement Pack.",
+    "uuid": "7b3a2d91-6f40-4c82-9e15-a8d72b31c604",
+    "version": [1, 1, 0],
+    "min_engine_version": [1, 20, 0]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "c4f8a210-8b53-4d76-a921-5e0c3b7f6149",
+      "version": [1, 1, 0]
+    }
+  ]
+}

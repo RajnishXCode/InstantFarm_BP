@@ -13,3 +13,11 @@ public_html/
 .vscode/
 .DS_Store
 Thumbs.db
+*.log
+
+# Generated build
+behavior_pack/scripts/main.js
+
+# Temporary files
+dist/
+build/

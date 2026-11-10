@@ -1,59 +1,377 @@
-name: Build and Deploy to GitHub Pages
+
+name: Build and Deploy InstantFarm
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
-# Grant permissions to write to GitHub Pages
 permissions:
   contents: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
+          cache: npm
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Build TypeScript
+      - name: Build Behavior Pack
         run: npm run build
 
-      - name: Package Behavior Pack
+      - name: Verify Build Output
         run: |
-          mkdir release
-          # Zip the required files into a Minecraft Pack format
-          zip -r release/InstantFarm_BP.mcpack manifest.json scripts/
-          
+          test -f behavior_pack/manifest.json
+          test -f behavior_pack/scripts/main.js
+          test -f resource_pack/manifest.json
+
+      - name: Package Minecraft Packs
+        run: |
+          mkdir -p release/staging
+
+          # Package Behavior Pack
+          cd behavior_pack
+          zip -qr ../release/InstantFarm_BP.mcpack .
+          cd ..
+
+          # Package Resource Pack
+          cd resource_pack
+          zip -qr ../release/InstantFarm_RP.mcpack .
+          cd ..
+
+          # Prepare combined add-on
+          mkdir -p release/staging/InstantFarm_BP
+          mkdir -p release/staging/InstantFarm_RP
+
+          cp -R behavior_pack/. release/staging/InstantFarm_BP/
+          cp -R resource_pack/. release/staging/InstantFarm_RP/
+
+          # Create combined .mcaddon
+          cd release/staging
+          zip -qr ../InstantFarm_VanillaPlus.mcaddon \
+            InstantFarm_BP InstantFarm_RP
+          cd ../..
+
+          # Remove temporary staging files
+          rm -rf release/staging
+
       - name: Generate Download Page
         run: |
-          # Create a simple, mobile-friendly HTML page for your phone
-          cat << 'EOF' > release/index.html
+          cat <<'EOF' > release/index.html
           <!DOCTYPE html>
-          <html>
-            <head>
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Pack Download</title>
-            </head>
-            <body style="font-family: sans-serif; padding: 2rem; text-align: center; background: #121212; color: white;">
-              <h1>Instant Farm BP</h1>
-              <p>Tap below to download and install on Minecraft PE.</p>
-              <br>
-              <a href="InstantFarm_BP.mcpack" style="padding: 1rem 2rem; background: #007bff; color: white; text-decoration: none; border-radius: 8px; font-size: 1.2rem; display: inline-block;">Download .mcpack</a>
-            </body>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="theme-color" content="#101810">
+
+            <title>InstantFarm | Vanilla+ Add-on</title>
+
+            <style>
+              * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+              }
+
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                  sans-serif;
+                background: #101810;
+                color: #f0f5ed;
+                min-height: 100vh;
+                padding: 24px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              }
+
+              .container {
+                width: 100%;
+                max-width: 760px;
+                margin: auto;
+              }
+
+              .hero {
+                text-align: center;
+                padding: 35px 15px;
+              }
+
+              .logo {
+                width: 76px;
+                height: 76px;
+                border-radius: 22px;
+                background: #263e29;
+                display: grid;
+                place-items: center;
+                font-size: 38px;
+                margin: 0 auto 22px;
+              }
+
+              .tag {
+                color: #a7d68b;
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                margin-bottom: 12px;
+              }
+
+              h1 {
+                font-size: clamp(34px, 7vw, 54px);
+                letter-spacing: -2px;
+                margin-bottom: 14px;
+              }
+
+              .subtitle {
+                color: #a5b3a2;
+                line-height: 1.7;
+                max-width: 510px;
+                margin: auto;
+                font-size: 15px;
+              }
+
+              .downloads {
+                display: grid;
+                gap: 14px;
+                margin-top: 20px;
+              }
+
+              .card {
+                background: #19251a;
+                border: 1px solid #2c3b2d;
+                border-radius: 18px;
+                padding: 23px;
+                display: flex;
+                align-items: center;
+                gap: 17px;
+              }
+
+              .card.featured {
+                border-color: #7ab75b;
+                background: #1d3020;
+              }
+
+              .icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 13px;
+                background: #293b2b;
+                display: grid;
+                place-items: center;
+                font-size: 24px;
+                flex-shrink: 0;
+              }
+
+              .details {
+                flex: 1;
+                min-width: 0;
+              }
+
+              .details h2 {
+                font-size: 17px;
+                margin-bottom: 6px;
+              }
+
+              .details p {
+                color: #a5b3a2;
+                font-size: 13px;
+                line-height: 1.5;
+              }
+
+              .recommended {
+                color: #a7d68b;
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 1px;
+                margin-bottom: 5px;
+              }
+
+              .download {
+                display: inline-block;
+                background: #a7d68b;
+                color: #142015;
+                padding: 12px 17px;
+                border-radius: 10px;
+                font-weight: 700;
+                font-size: 13px;
+                text-decoration: none;
+                white-space: nowrap;
+                transition: background 0.2s;
+              }
+
+              .download:hover {
+                background: #c0e6a9;
+              }
+
+              .info {
+                margin-top: 28px;
+                padding: 20px;
+                border-radius: 15px;
+                background: #19251a;
+                border: 1px solid #2c3b2d;
+              }
+
+              .info h3 {
+                font-size: 15px;
+                margin-bottom: 12px;
+              }
+
+              .info ol {
+                padding-left: 20px;
+                color: #a5b3a2;
+                font-size: 13px;
+                line-height: 2;
+              }
+
+              .footer {
+                text-align: center;
+                margin-top: 30px;
+                color: #778477;
+                font-size: 12px;
+                line-height: 1.8;
+              }
+
+              @media (max-width: 560px) {
+                body {
+                  padding: 16px;
+                  align-items: flex-start;
+                }
+
+                .hero {
+                  padding: 35px 5px 25px;
+                }
+
+                .card {
+                  flex-wrap: wrap;
+                  padding: 18px;
+                }
+
+                .details {
+                  flex: 1;
+                }
+
+                .download {
+                  width: 100%;
+                  text-align: center;
+                  margin-top: 5px;
+                }
+              }
+            </style>
+          </head>
+
+          <body>
+            <main class="container">
+
+              <section class="hero">
+                <div class="logo">🌱</div>
+
+                <div class="tag">Minecraft Bedrock Edition</div>
+
+                <h1>InstantFarm</h1>
+
+                <p class="subtitle">
+                  Enhance your survival experience with Vanilla+ features.
+                  Faster farming, instant tree generation and upcoming
+                  quality-of-life enhancements.
+                </p>
+              </section>
+
+              <section class="downloads">
+
+                <article class="card featured">
+                  <div class="icon">📦</div>
+
+                  <div class="details">
+                    <div class="recommended">RECOMMENDED</div>
+                    <h2>Complete Vanilla+ Add-on</h2>
+                    <p>
+                      Behavior Pack + Resource Pack together.
+                      Install both packs in one step.
+                    </p>
+                  </div>
+
+                  <a class="download"
+                     href="./InstantFarm_VanillaPlus.mcaddon"
+                     download>
+                    Download Add-on
+                  </a>
+                </article>
+
+                <article class="card">
+                  <div class="icon">⚙️</div>
+
+                  <div class="details">
+                    <h2>Behavior Pack</h2>
+                    <p>
+                      Gameplay logic, crop growth and tree generation.
+                    </p>
+                  </div>
+
+                  <a class="download"
+                     href="./InstantFarm_BP.mcpack"
+                     download>
+                    Download BP
+                  </a>
+                </article>
+
+                <article class="card">
+                  <div class="icon">🎨</div>
+
+                  <div class="details">
+                    <h2>Resource Pack</h2>
+                    <p>
+                      Textures, item assets and interface resources.
+                    </p>
+                  </div>
+
+                  <a class="download"
+                     href="./InstantFarm_RP.mcpack"
+                     download>
+                    Download RP
+                  </a>
+                </article>
+
+              </section>
+
+              <section class="info">
+                <h3>How to install</h3>
+
+                <ol>
+                  <li>Download the Complete Vanilla+ Add-on.</li>
+                  <li>Open the downloaded .mcaddon file.</li>
+                  <li>Minecraft Bedrock will import the packs.</li>
+                  <li>Enable both packs in your world's settings.</li>
+                  <li>Enjoy your enhanced survival experience.</li>
+                </ol>
+              </section>
+
+              <footer class="footer">
+                <p>InstantFarm Vanilla+ Enhancement Pack</p>
+                <p>Built for Minecraft Bedrock Edition</p>
+              </footer>
+
+            </main>
+          </body>
           </html>
           EOF
 
+          touch release/.nojekyll
+
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./release
+          force_orphan: true
