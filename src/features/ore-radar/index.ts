@@ -27,10 +27,7 @@ function isOreDetectorSelected(player: Player): boolean {
         );
 
         return selectedItem?.typeId === ORE_DETECTOR_ID;
-    } catch (error) {
-        console.warn(
-            `[OreRadar] Inventory check failed: ${String(error)}`
-        );
+    } catch {
         return false;
     }
 }
@@ -41,14 +38,26 @@ function displayRadar(player: Player): void {
         player.location
     );
 
+    const yaw = player.getRotation().y;
+
+    // const compass = calculateBearing(
+    //     player.location,
+    //     {
+    //         x: player.location.x,
+    //         y: player.location.y,
+    //         z: player.location.z + 10
+    //     },
+    //     yaw
+    // );
+
+    const header = "§a◉ ORE RADAR §8| §7SCANNING";
+
     if (targets.length === 0) {
         player.onScreenDisplay.setActionBar(
-            "§aORE RADAR §7| §8No ores detected nearby"
+            `${header}\n§7No ores detected within ${RADAR_CONFIG.radius} blocks`
         );
         return;
     }
-
-    const yaw = player.getRotation().y;
 
     const results = targets.map(target => {
         const bearing = calculateBearing(
@@ -59,11 +68,11 @@ function displayRadar(player: Player): void {
 
         const distance = Math.round(target.distance);
 
-        return `§f${target.name} §b${distance}m §e${bearing.arrow}`;
+        return `§e${bearing.arrow} §f${target.name} §b${distance} blocks §7(${bearing.direction})`;
     });
 
     player.onScreenDisplay.setActionBar(
-        `§aORE RADAR §7| ${results.join(" §8• ")}`
+        `${header}\n${results.join("\n")}`
     );
 }
 
@@ -75,7 +84,6 @@ export function initialize(): void {
             players.map(player => player.id)
         );
 
-        // Remove disconnected players.
         for (const playerId of activePlayers.keys()) {
             if (!onlineIds.has(playerId)) {
                 activePlayers.delete(playerId);
@@ -83,30 +91,33 @@ export function initialize(): void {
         }
 
         for (const player of players) {
-            const detectorSelected = isOreDetectorSelected(player);
+            const selected = isOreDetectorSelected(player);
             const wasActive = activePlayers.has(player.id);
 
-            // Detector was selected.
-            if (detectorSelected && !wasActive) {
+            if (selected && !wasActive) {
                 activePlayers.set(
                     player.id,
                     system.currentTick - RADAR_CONFIG.scanIntervalTicks
                 );
 
-                player.sendMessage("§a[Ore Radar] Radar activated.");
+                player.sendMessage(
+                    "§a[Ore Radar] Detector connected."
+                );
             }
 
-            // Player switched to another item.
-            if (!detectorSelected && wasActive) {
+            if (!selected && wasActive) {
                 activePlayers.delete(player.id);
 
                 player.onScreenDisplay.setActionBar("");
 
-                player.sendMessage("§7[Ore Radar] Radar deactivated.");
+                player.sendMessage(
+                    "§7[Ore Radar] Detector disconnected."
+                );
+
                 continue;
             }
 
-            if (!detectorSelected) continue;
+            if (!selected) continue;
 
             const lastScan = activePlayers.get(player.id)!;
 
@@ -117,7 +128,10 @@ export function initialize(): void {
                 continue;
             }
 
-            activePlayers.set(player.id, system.currentTick);
+            activePlayers.set(
+                player.id,
+                system.currentTick
+            );
 
             try {
                 displayRadar(player);
@@ -129,5 +143,5 @@ export function initialize(): void {
         }
     }, 5);
 
-    console.warn("[OreRadar] Held-item controller initialized.");
+    console.warn("[OreRadar] Live radar initialized.");
 }

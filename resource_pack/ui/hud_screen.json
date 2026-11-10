@@ -2,53 +2,67 @@
 {
   "namespace": "hud",
 
-  "ore_radar_background": {
+  "ore_radar_panel": {
     "type": "image",
     "texture": "textures/ui/Black",
-    "size": [132, 66],
-    "alpha": 0.55,
+    "size": [190, 116],
+    "alpha": 0.72,
+    "layer": 40,
     "anchor_from": "top_right",
     "anchor_to": "top_right",
-    "offset": [-8, 8]
-  },
-
-  "ore_radar_title": {
-    "type": "label",
-    "text": "ORE RADAR",
-    "font_size": "small",
-    "color": "#55FFAA",
-    "shadow": true,
-    "anchor_from": "top_left",
-    "anchor_to": "top_left",
-    "offset": [8, 6]
-  },
-
-  "ore_radar_status": {
-    "type": "label",
-    "text": "FRONTEND PROTOTYPE",
-    "font_size": "small",
-    "color": "#FFFFFF",
-    "shadow": true,
-    "anchor_from": "top_left",
-    "anchor_to": "top_left",
-    "offset": [8, 24]
-  },
-
-  "ore_radar_panel": {
-    "type": "panel",
-    "size": [132, 66],
-    "anchor_from": "top_right",
-    "anchor_to": "top_right",
-    "offset": [-8, 8],
+    "offset": [-12, 12],
+    "$radar_text": "$actionbar_text",
+    "visible": "(not ($radar_text = ''))",
     "controls": [
       {
-        "background@hud.ore_radar_background": {}
+        "radar_border": {
+          "type": "image",
+          "texture": "textures/ui/Black",
+          "size": ["100%", "100%"],
+          "alpha": 0.2,
+          "layer": 1
+        }
       },
       {
-        "title@hud.ore_radar_title": {}
+        "radar_title": {
+          "type": "label",
+          "text": "◉ ORE DETECTOR",
+          "font_size": "small",
+          "color": "#55FFAA",
+          "shadow": true,
+          "layer": 2,
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "offset": [8, 6]
+        }
       },
       {
-        "status@hud.ore_radar_status": {}
+        "radar_separator": {
+          "type": "image",
+          "texture": "textures/ui/Black",
+          "color": "#55FFAA",
+          "size": [174, 1],
+          "alpha": 0.8,
+          "layer": 2,
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "offset": [8, 23]
+        }
+      },
+      {
+        "radar_data": {
+          "type": "label",
+          "text": "$radar_text",
+          "font_size": "small",
+          "color": "#FFFFFF",
+          "shadow": true,
+          "layer": 3,
+          "localize": false,
+          "max_size": [174, 82],
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "offset": [8, 30]
+        }
       }
     ]
   },
