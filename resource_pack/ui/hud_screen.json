@@ -1,0 +1,69 @@
+
+{
+  "namespace": "hud",
+
+  "ore_radar_background": {
+    "type": "image",
+    "texture": "textures/ui/Black",
+    "size": [132, 66],
+    "alpha": 0.55,
+    "anchor_from": "top_right",
+    "anchor_to": "top_right",
+    "offset": [-8, 8]
+  },
+
+  "ore_radar_title": {
+    "type": "label",
+    "text": "ORE RADAR",
+    "font_size": "small",
+    "color": "#55FFAA",
+    "shadow": true,
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "offset": [8, 6]
+  },
+
+  "ore_radar_status": {
+    "type": "label",
+    "text": "FRONTEND PROTOTYPE",
+    "font_size": "small",
+    "color": "#FFFFFF",
+    "shadow": true,
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "offset": [8, 24]
+  },
+
+  "ore_radar_panel": {
+    "type": "panel",
+    "size": [132, 66],
+    "anchor_from": "top_right",
+    "anchor_to": "top_right",
+    "offset": [-8, 8],
+    "controls": [
+      {
+        "background@hud.ore_radar_background": {}
+      },
+      {
+        "title@hud.ore_radar_title": {}
+      },
+      {
+        "status@hud.ore_radar_status": {}
+      }
+    ]
+  },
+
+  "root_panel": {
+    "modifications": [
+      {
+        "array_name": "controls",
+        "operation": "insert_front",
+        "value": [
+          {
+            "ore_radar_panel@hud.ore_radar_panel": {}
+          }
+        ]
+      }
+    ]
+  }
+}
