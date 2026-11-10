@@ -32,6 +32,51 @@ function isOreDetectorSelected(player: Player): boolean {
     }
 }
 
+// function displayRadar(player: Player): void {
+//     const targets = scanNearbyOres(
+//         player.dimension,
+//         player.location
+//     );
+
+//     const yaw = player.getRotation().y;
+
+//     // const compass = calculateBearing(
+//     //     player.location,
+//     //     {
+//     //         x: player.location.x,
+//     //         y: player.location.y,
+//     //         z: player.location.z + 10
+//     //     },
+//     //     yaw
+//     // );
+
+//     const header = "§a◉ ORE RADAR §8| §7SCANNING";
+
+//     if (targets.length === 0) {
+//         player.onScreenDisplay.setActionBar(
+//             `${header}\n§7No ores detected within ${RADAR_CONFIG.radius} blocks`
+//         );
+//         return;
+//     }
+
+//     const results = targets.map(target => {
+//         const bearing = calculateBearing(
+//             player.location,
+//             target.location,
+//             yaw
+//         );
+
+//         const distance = Math.round(target.distance);
+
+//         return `§e${bearing.arrow} §f${target.name} §b${distance} blocks §7(${bearing.direction})`;
+//     });
+
+//     player.onScreenDisplay.setActionBar(
+//         `${header}\n${results.join("\n")}`
+//     );
+// }
+
+
 function displayRadar(player: Player): void {
     const targets = scanNearbyOres(
         player.dimension,
@@ -40,21 +85,11 @@ function displayRadar(player: Player): void {
 
     const yaw = player.getRotation().y;
 
-    // const compass = calculateBearing(
-    //     player.location,
-    //     {
-    //         x: player.location.x,
-    //         y: player.location.y,
-    //         z: player.location.z + 10
-    //     },
-    //     yaw
-    // );
-
     const header = "§a◉ ORE RADAR §8| §7SCANNING";
 
     if (targets.length === 0) {
         player.onScreenDisplay.setActionBar(
-            `${header}\n§7No ores detected within ${RADAR_CONFIG.radius} blocks`
+            `${header}\n§7No ores detected nearby`
         );
         return;
     }
@@ -66,15 +101,18 @@ function displayRadar(player: Player): void {
             yaw
         );
 
-        const distance = Math.round(target.distance);
-
-        return `§e${bearing.arrow} §f${target.name} §b${distance} blocks §7(${bearing.direction})`;
+        return (
+            `§e${bearing.arrow} ` +
+            `§f${target.name} ` +
+            `§b${Math.round(target.distance)} blocks`
+        );
     });
 
     player.onScreenDisplay.setActionBar(
         `${header}\n${results.join("\n")}`
     );
 }
+
 
 export function initialize(): void {
     system.runInterval(() => {
