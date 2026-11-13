@@ -37,6 +37,14 @@ function formatVerticalOffset(offset: number): string {
     return "§7same level";
 }
 
+function getErrorMessage(error: unknown): string {
+    const message = error instanceof Error
+        ? error.message
+        : String(error);
+
+    return message.replace(/\s+/g, " ").slice(0, 90);
+}
+
 function displayRadar(player: Player): void {
     const targets = scanNearbyOres(
         player.dimension,
@@ -130,7 +138,7 @@ export function initialize(): void {
                 displayRadar(player);
             } catch (error) {
                 player.onScreenDisplay.setActionBar(
-                    "§cScan failed. Retrying..."
+                    `§cScan failed. Retrying...\n§f${getErrorMessage(error)}`
                 );
 
                 console.warn(

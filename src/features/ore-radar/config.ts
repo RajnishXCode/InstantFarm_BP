@@ -4,6 +4,7 @@ export const RADAR_CONFIG = {
     scanIntervalTicks: 40, // 2 seconds
     maxTargets: 3,
     scanCandidates: 24,
+    queryChunkSize: 16,
 
     // Prevent multiple blocks from one ore vein
     veinSeparation: 3
