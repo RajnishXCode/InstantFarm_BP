@@ -1,45 +1,73 @@
 
-export const RADAR_CONFIG = {
-    radius: 24,
-    scanIntervalTicks: 40, // 2 seconds
-    maxTargets: 3,
-    scanCandidates: 24,
-    queryChunkSize: 16,
+import type { OreDefinition } from "./types";
 
-    // Prevent multiple blocks from one ore vein
-    veinSeparation: 3
+export const RADAR_CONFIG = {
+    itemId: "instantfarm:ore_detector",
+
+    // Scan volume around the player, in blocks.
+    scanRadius: 32,
+
+    // Ticks between full scans (20 ticks = 1 second).
+    scanIntervalTicks: 20,
+
+    // Ticks between held-item checks and display updates.
+    updateIntervalTicks: 2,
+
+    // Minimum ticks between changed-text updates while the player moves or turns.
+    displayMinIntervalTicks: 4,
+
+    // Re-send the actionbar at least this often so vanilla does not fade it out.
+    displayRefreshTicks: 20,
+
+    // Chunk ore lists are reused for this many ticks before being re-queried.
+    chunkCacheTicks: 200,
+
+    // Caches above this size are pruned of stale entries.
+    chunkCachePruneSize: 512,
+
+    // Upper bound on ore blocks verified per scan (nearest first).
+    maxVerifiedBlocks: 128,
+
+    // Ore blocks within this distance of each other belong to one vein.
+    veinLinkDistance: 2,
+
+    // Maximum number of veins shown on the radar.
+    maxResults: 5,
+
+    // Side length of a block-query cube. Matches Bedrock subchunks.
+    chunkSize: 16
 } as const;
 
-export const ORE_BLOCKS: Record<string, string> = {
-    "minecraft:coal_ore": "Coal",
-    "minecraft:deepslate_coal_ore": "Coal",
+export const ORE_DEFINITIONS: Readonly<Record<string, OreDefinition>> = {
+    "minecraft:coal_ore": { name: "Coal", color: "§8" },
+    "minecraft:deepslate_coal_ore": { name: "Coal", color: "§8" },
 
-    "minecraft:iron_ore": "Iron",
-    "minecraft:deepslate_iron_ore": "Iron",
+    "minecraft:iron_ore": { name: "Iron", color: "§7" },
+    "minecraft:deepslate_iron_ore": { name: "Iron", color: "§7" },
 
-    "minecraft:copper_ore": "Copper",
-    "minecraft:deepslate_copper_ore": "Copper",
+    "minecraft:copper_ore": { name: "Copper", color: "§3" },
+    "minecraft:deepslate_copper_ore": { name: "Copper", color: "§3" },
 
-    "minecraft:gold_ore": "Gold",
-    "minecraft:deepslate_gold_ore": "Gold",
+    "minecraft:gold_ore": { name: "Gold", color: "§e" },
+    "minecraft:deepslate_gold_ore": { name: "Gold", color: "§e" },
 
-    "minecraft:redstone_ore": "Redstone",
-    "minecraft:lit_redstone_ore": "Redstone",
-    "minecraft:deepslate_redstone_ore": "Redstone",
-    "minecraft:lit_deepslate_redstone_ore": "Redstone",
+    "minecraft:redstone_ore": { name: "Redstone", color: "§4" },
+    "minecraft:lit_redstone_ore": { name: "Redstone", color: "§4" },
+    "minecraft:deepslate_redstone_ore": { name: "Redstone", color: "§4" },
+    "minecraft:lit_deepslate_redstone_ore": { name: "Redstone", color: "§4" },
 
-    "minecraft:lapis_ore": "Lapis",
-    "minecraft:deepslate_lapis_ore": "Lapis",
+    "minecraft:lapis_ore": { name: "Lapis", color: "§9" },
+    "minecraft:deepslate_lapis_ore": { name: "Lapis", color: "§9" },
 
-    "minecraft:diamond_ore": "Diamond",
-    "minecraft:deepslate_diamond_ore": "Diamond",
+    "minecraft:diamond_ore": { name: "Diamond", color: "§b" },
+    "minecraft:deepslate_diamond_ore": { name: "Diamond", color: "§b" },
 
-    "minecraft:emerald_ore": "Emerald",
-    "minecraft:deepslate_emerald_ore": "Emerald",
+    "minecraft:emerald_ore": { name: "Emerald", color: "§a" },
+    "minecraft:deepslate_emerald_ore": { name: "Emerald", color: "§a" },
 
-    "minecraft:nether_quartz_ore": "Quartz",
-    "minecraft:nether_gold_ore": "Nether Gold",
-    "minecraft:ancient_debris": "Ancient Debris"
+    "minecraft:nether_gold_ore": { name: "Nether Gold", color: "§6" },
+    "minecraft:quartz_ore": { name: "Nether Quartz", color: "§f" },
+    "minecraft:ancient_debris": { name: "Ancient Debris", color: "§5" }
 };
 
-export const ORE_BLOCK_IDS = Object.keys(ORE_BLOCKS);
+export const ORE_BLOCK_IDS: string[] = Object.keys(ORE_DEFINITIONS);

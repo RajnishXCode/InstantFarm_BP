@@ -1,3 +1,4 @@
+
 import {
     BlockVolume,
     type Dimension,
@@ -5,24 +6,37 @@ import {
 } from "@minecraft/server";
 
 import {
-    RADAR_CONFIG,
-    ORE_BLOCKS,
-    ORE_BLOCK_IDS
+    ORE_BLOCK_IDS,
+    ORE_DEFINITIONS,
+    RADAR_CONFIG
 } from "./config";
 
-export interface OreTarget {
-    typeId: string;
-    name: string;
-    location: Vector3;
-    distance: number;
+import type { OreVein, ScanReport } from "./types";
+
+interface ChunkEntry {
+    readonly scannedTick: number;
+    readonly positions: Vector3[];
 }
 
-interface BlockCandidate {
-    location: Vector3;
-    distance: number;
+interface Candidate {
+    readonly location: Vector3;
+    readonly distance: number;
 }
 
-function distanceFromOrigin(location: Vector3, origin: Vector3): number {
+interface VerifiedBlock {
+    readonly typeId: string;
+    readonly location: Vector3;
+}
+
+interface VeinBuilder {
+    readonly typeId: string;
+    readonly nearest: Vector3;
+    readonly members: Vector3[];
+}
+
+const chunkCache = new Map<string, ChunkEntry>();
+
+function distanceToBlockCenter(origin: Vector3, location: Vector3): number {
     const dx = location.x + 0.5 - origin.x;
     const dy = location.y + 0.5 - origin.y;
     const dz = location.z + 0.5 - origin.z;
@@ -30,121 +44,193 @@ function distanceFromOrigin(location: Vector3, origin: Vector3): number {
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }
 
-function findOreCandidates(
+function squaredDistance(a: Vector3, b: Vector3): number {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const dz = a.z - b.z;
+
+    return dx * dx + dy * dy + dz * dz;
+}
+
+function chunkIntersectsRadius(
+    origin: Vector3,
+    cx: number,
+    cy: number,
+    cz: number
+): boolean {
+    const size = RADAR_CONFIG.chunkSize;
+    const radius = RADAR_CONFIG.scanRadius;
+
+    const nearestX = Math.min(Math.max(origin.x, cx * size), cx * size + size);
+    const nearestY = Math.min(Math.max(origin.y, cy * size), cy * size + size);
+    const nearestZ = Math.min(Math.max(origin.z, cz * size), cz * size + size);
+
+    return squaredDistance(origin, {
+        x: nearestX,
+        y: nearestY,
+        z: nearestZ
+    }) <= radius * radius;
+}
+
+function pruneChunkCache(tick: number): void {
+    if (chunkCache.size <= RADAR_CONFIG.chunkCachePruneSize) return;
+
+    for (const [key, entry] of chunkCache) {
+        if (tick - entry.scannedTick >= RADAR_CONFIG.chunkCacheTicks) {
+            chunkCache.delete(key);
+        }
+    }
+}
+
+/**
+ * Returns every ore block position inside one 16x16x16 chunk, or undefined
+ * when the chunk is not loaded. Results are cached per chunk for a short
+ * time so the same chunk is not re-queried on every scan.
+ */
+function getChunkOrePositions(
+    dimension: Dimension,
+    cx: number,
+    cy: number,
+    cz: number,
+    tick: number
+): Vector3[] | undefined {
+    const size = RADAR_CONFIG.chunkSize;
+    const key = `${dimension.id}|${cx}|${cy}|${cz}`;
+
+    const cached = chunkCache.get(key);
+
+    if (cached && tick - cached.scannedTick < RADAR_CONFIG.chunkCacheTicks) {
+        return cached.positions;
+    }
+
+    const { min, max } = dimension.heightRange;
+
+    const minX = cx * size;
+    const minZ = cz * size;
+    const minY = Math.max(cy * size, min);
+    const maxY = Math.min(cy * size + size - 1, max);
+
+    if (minY > maxY) return [];
+
+    // getBlock returns undefined for blocks in unloaded chunks. Probing one
+    // block avoids a throwing block query and leaves the chunk uncached, so
+    // it is retried on a later scan.
+    if (dimension.getBlock({ x: minX, y: minY, z: minZ }) === undefined) {
+        return undefined;
+    }
+
+    const volume = new BlockVolume(
+        { x: minX, y: minY, z: minZ },
+        { x: minX + size - 1, y: maxY, z: minZ + size - 1 }
+    );
+
+    const matches = dimension.getBlocks(
+        volume,
+        { includeTypes: ORE_BLOCK_IDS },
+        true
+    );
+
+    const positions: Vector3[] = [];
+
+    for (const location of matches.getBlockLocationIterator()) {
+        positions.push({ x: location.x, y: location.y, z: location.z });
+    }
+
+    chunkCache.set(key, { scannedTick: tick, positions });
+    pruneChunkCache(tick);
+
+    return positions;
+}
+
+function groupIntoVeins(blocks: VerifiedBlock[]): OreVein[] {
+    const linkSquared = RADAR_CONFIG.veinLinkDistance ** 2;
+    const builders: VeinBuilder[] = [];
+
+    // Blocks arrive nearest-first, so each vein's first member is its nearest block.
+    for (const block of blocks) {
+        const vein = builders.find(builder =>
+            builder.typeId === block.typeId &&
+            builder.members.some(member =>
+                squaredDistance(member, block.location) <= linkSquared
+            )
+        );
+
+        if (vein) {
+            vein.members.push(block.location);
+        } else {
+            builders.push({
+                typeId: block.typeId,
+                nearest: block.location,
+                members: [block.location]
+            });
+        }
+    }
+
+    return builders.map(builder => ({
+        typeId: builder.typeId,
+        nearest: builder.nearest,
+        blockCount: builder.members.length
+    }));
+}
+
+export function scanOres(
     dimension: Dimension,
     origin: Vector3,
-    center: Vector3,
-    minY: number,
-    maxY: number
-): BlockCandidate[] {
-    const radius = RADAR_CONFIG.radius;
-    const chunkSize = RADAR_CONFIG.queryChunkSize;
-    const candidates: BlockCandidate[] = [];
+    tick: number
+): ScanReport {
+    const size = RADAR_CONFIG.chunkSize;
+    const radius = RADAR_CONFIG.scanRadius;
+    const heightRange = dimension.heightRange;
 
-    const minX = center.x - radius;
-    const maxX = center.x + radius;
-    const minZ = center.z - radius;
-    const maxZ = center.z + radius;
+    const minCx = Math.floor((origin.x - radius) / size);
+    const maxCx = Math.floor((origin.x + radius) / size);
+    const minCy = Math.floor(Math.max(origin.y - radius, heightRange.min) / size);
+    const maxCy = Math.floor(Math.min(origin.y + radius, heightRange.max) / size);
+    const minCz = Math.floor((origin.z - radius) / size);
+    const maxCz = Math.floor((origin.z + radius) / size);
 
-    // Small queries avoid oversized BlockVolume errors and engine-specific
-    // closest-query limitations. Results are sorted globally below.
-    for (let fromX = minX; fromX <= maxX; fromX += chunkSize) {
-        for (let fromY = minY; fromY <= maxY; fromY += chunkSize) {
-            for (let fromZ = minZ; fromZ <= maxZ; fromZ += chunkSize) {
-                const volume = new BlockVolume(
-                    { x: fromX, y: fromY, z: fromZ },
-                    {
-                        x: Math.min(fromX + chunkSize - 1, maxX),
-                        y: Math.min(fromY + chunkSize - 1, maxY),
-                        z: Math.min(fromZ + chunkSize - 1, maxZ)
-                    }
-                );
+    let unloadedChunks = 0;
+    const candidates: Candidate[] = [];
 
-                const matchingBlocks = dimension.getBlocks(
-                    volume,
-                    { includeTypes: ORE_BLOCK_IDS },
-                    true
-                );
+    for (let cx = minCx; cx <= maxCx; cx++) {
+        for (let cy = minCy; cy <= maxCy; cy++) {
+            for (let cz = minCz; cz <= maxCz; cz++) {
+                if (!chunkIntersectsRadius(origin, cx, cy, cz)) continue;
 
-                for (const location of matchingBlocks.getBlockLocationIterator()) {
-                    const distance = distanceFromOrigin(location, origin);
+                const positions = getChunkOrePositions(dimension, cx, cy, cz, tick);
+
+                if (!positions) {
+                    unloadedChunks++;
+                    continue;
+                }
+
+                for (const location of positions) {
+                    const distance = distanceToBlockCenter(origin, location);
 
                     if (distance <= radius) {
-                        candidates.push({
-                            location: { ...location },
-                            distance
-                        });
+                        candidates.push({ location, distance });
                     }
                 }
             }
         }
     }
 
-    return candidates.sort((a, b) => a.distance - b.distance);
-}
+    candidates.sort((a, b) => a.distance - b.distance);
 
-export function scanNearbyOres(
-    dimension: Dimension,
-    origin: Vector3
-): OreTarget[] {
-    const radius = RADAR_CONFIG.radius;
-    const center = {
-        x: Math.floor(origin.x),
-        y: Math.floor(origin.y),
-        z: Math.floor(origin.z)
-    };
+    // Cached positions can be stale (mined ore), so each candidate is
+    // re-read from the world before it is shown.
+    const verified: VerifiedBlock[] = [];
 
-    const minY = Math.max(
-        center.y - radius,
-        dimension.heightRange.min
-    );
-    const maxY = Math.min(
-        center.y + radius,
-        dimension.heightRange.max
-    );
-
-    if (minY > maxY) return [];
-
-    const candidates = findOreCandidates(
-        dimension,
-        origin,
-        center,
-        minY,
-        maxY
-    );
-
-    const targets: OreTarget[] = [];
-
-    for (const candidate of candidates.slice(0, RADAR_CONFIG.scanCandidates)) {
+    for (const candidate of candidates.slice(0, RADAR_CONFIG.maxVerifiedBlocks)) {
         const block = dimension.getBlock(candidate.location);
-        if (!block) continue;
 
-        const name = ORE_BLOCKS[block.typeId];
-        if (!name) continue;
+        if (!block || !(block.typeId in ORE_DEFINITIONS)) continue;
 
-        // Avoid displaying multiple blocks from the same ore vein.
-        const belongsToExistingVein = targets.some(target => {
-            if (target.typeId !== block.typeId) return false;
-
-            const dx = target.location.x - candidate.location.x;
-            const dy = target.location.y - candidate.location.y;
-            const dz = target.location.z - candidate.location.z;
-
-            return Math.sqrt(dx * dx + dy * dy + dz * dz) <=
-                RADAR_CONFIG.veinSeparation;
-        });
-
-        if (belongsToExistingVein) continue;
-
-        targets.push({
-            typeId: block.typeId,
-            name,
-            location: candidate.location,
-            distance: candidate.distance
-        });
-
-        if (targets.length >= RADAR_CONFIG.maxTargets) break;
+        verified.push({ typeId: block.typeId, location: candidate.location });
     }
 
-    return targets;
+    return {
+        veins: groupIntoVeins(verified),
+        unloadedChunks
+    };
 }

@@ -12,10 +12,11 @@ This project is written in TypeScript and bundled into a Minecraft script module
 - Instant tree generation
   - Replaces planted saplings with the matching tree feature so large trees appear almost immediately.
   - Supports the default tree variants included in the feature configuration.
-- Ore radar
-  - Opens a live radar panel while the Ore Detector is selected in the hotbar.
-  - Scans a 24-block radius every 2 seconds and displays up to three nearby ore veins.
-  - Shows each ore's direction, distance, and vertical offset from the player.
+- Ore Sectors Radar
+  - Holding the Ore Detector in your main hand shows the radar in the actionbar above the hotbar. Switching to another item hides it.
+  - Scans a 32-block radius every second for coal, iron, copper, gold, redstone, lapis, diamond, emerald, nether gold, nether quartz and ancient debris, including deepslate variants.
+  - Lists up to five ore veins sorted by distance, each with its ore type, distance, direction relative to where you are facing, and vertical offset.
+  - Direction and distance update as you move or turn, without rescanning.
 
 ## Project structure
 
@@ -23,7 +24,12 @@ This project is written in TypeScript and bundled into a Minecraft script module
 - `src/core/registry.ts` - simple feature registration and startup system.
 - `src/features/crops/index.ts` - crop growth logic.
 - `src/features/trees/index.ts` - instant tree generation logic.
-- `src/features/ore-radar/` - ore scanning, radar display, and compass tracking.
+- `src/features/ore-radar/index.ts` - ore radar initialization and tick loop.
+- `src/features/ore-radar/detector.ts` - held-item detection, scan scheduling, and per-player radar state.
+- `src/features/ore-radar/scanner.ts` - chunk-based ore scanning with a short-lived chunk cache.
+- `src/features/ore-radar/direction.ts` - view-relative direction, distance, and vertical offset.
+- `src/features/ore-radar/hud.ts` - actionbar text layout.
+- `src/features/ore-radar/config.ts` - radius, intervals, result limit, and supported ore blocks.
 - `behavior_pack/manifest.json` - behavior pack metadata and script entry configuration.
 - `behavior_pack/scripts/main.js` - generated bundled script output.
 
@@ -63,9 +69,16 @@ behavior_pack/scripts/main.js
 
 Place the `behavior_pack` folder into your Minecraft Bedrock add-ons folder or import it into a world as a behavior pack.
 
-Enable **both** the behavior pack and resource pack in the world. The resource pack is required for the radar panel and item texture.
+Enable **both** the behavior pack and resource pack in the world. The resource pack provides the Ore Detector item texture and name.
 
-To use the radar, craft an Ore Detector or run `/give @s instantfarm:ore_detector`, then select it in your hotbar. The radar panel opens automatically and closes when you select another item.
+To use the radar, craft an Ore Detector (copper ingots, amethyst shard, redstone and a compass in a crafting table) or run `/give @s instantfarm:ore_detector`, then hold it in your main hand. The radar appears automatically and disappears when you select another item.
+
+### Ore radar limitations
+
+- The radar is drawn through the actionbar. Bedrock's Script API can only update the actionbar, title and subtitle text. It cannot draw a custom HUD layout, so the radar is text-only and sits above the hotbar.
+- Replacing vanilla HUD layouts would require shipping a full copy of the game's `hud_screen.json`, which is not included.
+- The actionbar is shared, so the radar replaces other actionbar messages while the Ore Detector is held.
+- Ore veins are counted from the 128 nearest ore blocks in range. Blocks in unloaded chunks are skipped until those chunks load.
 
 ## Scripts
 

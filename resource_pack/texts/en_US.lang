@@ -5,27 +5,3 @@ pack.description=Textures and interface for Instant Farm Vanilla+
 
 # Custom items
 item.instantfarm:ore_detector.name=Ore Detector
-
-# Ore Radar interface
-instantfarm.radar.title=ORE RADAR
-instantfarm.radar.status.scanning=SCANNING
-instantfarm.radar.status.no_targets=NO ORES DETECTED
-instantfarm.radar.status.error=SCAN ERROR
-instantfarm.radar.status.inactive=INACTIVE
-
-# Radar controls
-instantfarm.radar.activated=Ore Radar activated.
-instantfarm.radar.deactivated=Ore Radar deactivated.
-
-# Ore names
-instantfarm.ore.coal=Coal
-instantfarm.ore.iron=Iron
-instantfarm.ore.copper=Copper
-instantfarm.ore.gold=Gold
-instantfarm.ore.redstone=Redstone
-instantfarm.ore.lapis=Lapis Lazuli
-instantfarm.ore.diamond=Diamond
-instantfarm.ore.emerald=Emerald
-instantfarm.ore.quartz=Nether Quartz
-instantfarm.ore.nether_gold=Nether Gold
-instantfarm.ore.ancient_debris=Ancient Debris
