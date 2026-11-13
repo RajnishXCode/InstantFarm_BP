@@ -9,29 +9,21 @@
       "crafting_table"
     ],
     "pattern": [
-      "CAC",
-      "RPR",
-      " C "
+      "IEI",
+      " R ",
+      " I "
     ],
     "key": {
-      "C": {
-        "item": "minecraft:copper_ingot"
+      "E": {
+        "item": "minecraft:emerald"
       },
-      "A": {
-        "item": "minecraft:amethyst_shard"
+      "I": {
+        "item": "minecraft:iron_ingot"
       },
       "R": {
         "item": "minecraft:redstone"
-      },
-      "P": {
-        "item": "minecraft:compass"
       }
     },
-    "unlock": [
-      {
-        "item": "minecraft:compass"
-      }
-    ],
     "result": {
       "item": "instantfarm:ore_detector",
       "count": 1
