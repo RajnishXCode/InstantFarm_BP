@@ -8,7 +8,10 @@ const TREE_FEATURES: Record<string, string> = {
     "minecraft:jungle_sapling": "minecraft:jungle_tree_feature",
     "minecraft:acacia_sapling": "minecraft:savanna_tree_feature",
     "minecraft:dark_oak_sapling": "minecraft:random_roofed_forest_feature",
-    "minecraft:cherry_sapling": "minecraft:cherry_tree_feature"
+    "minecraft:cherry_sapling": "minecraft:cherry_tree_feature",
+    "minecraft:mangrove_propagule": "minecraft:mangrove_tree_feature",
+    "minecraft:pale_oak_sapling": "minecraft:pale_oak_tree_feature",
+    "minecraft:poplar_sapling": "minecraft:poplar_tree_feature"
 };
 
 export function initialize(): void {
