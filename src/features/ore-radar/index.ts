@@ -1,4 +1,3 @@
-
 import {
     world,
     system,
@@ -32,50 +31,11 @@ function isOreDetectorSelected(player: Player): boolean {
     }
 }
 
-// function displayRadar(player: Player): void {
-//     const targets = scanNearbyOres(
-//         player.dimension,
-//         player.location
-//     );
-
-//     const yaw = player.getRotation().y;
-
-//     // const compass = calculateBearing(
-//     //     player.location,
-//     //     {
-//     //         x: player.location.x,
-//     //         y: player.location.y,
-//     //         z: player.location.z + 10
-//     //     },
-//     //     yaw
-//     // );
-
-//     const header = "§a◉ ORE RADAR §8| §7SCANNING";
-
-//     if (targets.length === 0) {
-//         player.onScreenDisplay.setActionBar(
-//             `${header}\n§7No ores detected within ${RADAR_CONFIG.radius} blocks`
-//         );
-//         return;
-//     }
-
-//     const results = targets.map(target => {
-//         const bearing = calculateBearing(
-//             player.location,
-//             target.location,
-//             yaw
-//         );
-
-//         const distance = Math.round(target.distance);
-
-//         return `§e${bearing.arrow} §f${target.name} §b${distance} blocks §7(${bearing.direction})`;
-//     });
-
-//     player.onScreenDisplay.setActionBar(
-//         `${header}\n${results.join("\n")}`
-//     );
-// }
-
+function formatVerticalOffset(offset: number): string {
+    if (offset > 0) return `§a+${offset}Y`;
+    if (offset < 0) return `§c${offset}Y`;
+    return "§7same level";
+}
 
 function displayRadar(player: Player): void {
     const targets = scanNearbyOres(
@@ -85,11 +45,9 @@ function displayRadar(player: Player): void {
 
     const yaw = player.getRotation().y;
 
-    const header = "§a◉ ORE RADAR §8| §7SCANNING";
-
     if (targets.length === 0) {
         player.onScreenDisplay.setActionBar(
-            `${header}\n§7No ores detected nearby`
+            `§7No ores detected within ${RADAR_CONFIG.radius} blocks`
         );
         return;
     }
@@ -101,18 +59,19 @@ function displayRadar(player: Player): void {
             yaw
         );
 
+        const verticalOffset = Math.floor(
+            target.location.y + 0.5 - player.location.y
+        );
+
         return (
-            `§e${bearing.arrow} ` +
-            `§f${target.name} ` +
-            `§b${Math.round(target.distance)} blocks`
+            `§e${bearing.arrow} §f${target.name} ` +
+            `§b${Math.round(target.distance)}m ` +
+            `§7${bearing.direction} ${formatVerticalOffset(verticalOffset)}`
         );
     });
 
-    player.onScreenDisplay.setActionBar(
-        `${header}\n${results.join("\n")}`
-    );
+    player.onScreenDisplay.setActionBar(results.join("\n"));
 }
-
 
 export function initialize(): void {
     system.runInterval(() => {
@@ -145,7 +104,6 @@ export function initialize(): void {
 
             if (!selected && wasActive) {
                 activePlayers.delete(player.id);
-
                 player.onScreenDisplay.setActionBar("");
 
                 player.sendMessage(
@@ -166,14 +124,15 @@ export function initialize(): void {
                 continue;
             }
 
-            activePlayers.set(
-                player.id,
-                system.currentTick
-            );
+            activePlayers.set(player.id, system.currentTick);
 
             try {
                 displayRadar(player);
             } catch (error) {
+                player.onScreenDisplay.setActionBar(
+                    "§cScan failed. Retrying..."
+                );
+
                 console.warn(
                     `[OreRadar] Scan failed: ${String(error)}`
                 );

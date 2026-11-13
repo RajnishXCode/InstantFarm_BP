@@ -12,8 +12,10 @@ This project is written in TypeScript and bundled into a Minecraft script module
 - Instant tree generation
   - Replaces planted saplings with the matching tree feature so large trees appear almost immediately.
   - Supports the default tree variants included in the feature configuration.
-- Ore radar scaffold
-  - Includes starter modules for future ore detection and compass-based tracking features.
+- Ore radar
+  - Opens a live radar panel while the Ore Detector is selected in the hotbar.
+  - Scans a 24-block radius every 2 seconds and displays up to three nearby ore veins.
+  - Shows each ore's direction, distance, and vertical offset from the player.
 
 ## Project structure
 
@@ -21,7 +23,7 @@ This project is written in TypeScript and bundled into a Minecraft script module
 - `src/core/registry.ts` - simple feature registration and startup system.
 - `src/features/crops/index.ts` - crop growth logic.
 - `src/features/trees/index.ts` - instant tree generation logic.
-- `src/features/ore-radar/` - experimental ore radar-related modules.
+- `src/features/ore-radar/` - ore scanning, radar display, and compass tracking.
 - `behavior_pack/manifest.json` - behavior pack metadata and script entry configuration.
 - `behavior_pack/scripts/main.js` - generated bundled script output.
 
@@ -61,7 +63,9 @@ behavior_pack/scripts/main.js
 
 Place the `behavior_pack` folder into your Minecraft Bedrock add-ons folder or import it into a world as a behavior pack.
 
-Once enabled in a world, the pack will automatically apply the configured survival enhancements.
+Enable **both** the behavior pack and resource pack in the world. The resource pack is required for the radar panel and item texture.
+
+To use the radar, craft an Ore Detector or run `/give @s instantfarm:ore_detector`, then select it in your hotbar. The radar panel opens automatically and closes when you select another item.
 
 ## Scripts
 

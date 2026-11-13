@@ -31,15 +31,26 @@ export function scanNearbyOres(
         z: Math.floor(origin.z)
     };
 
+    const minY = Math.max(
+        center.y - radius,
+        dimension.heightRange.min
+    );
+    const maxY = Math.min(
+        center.y + radius,
+        dimension.heightRange.max
+    );
+
+    if (minY > maxY) return [];
+
     const volume = new BlockVolume(
         {
             x: center.x - radius,
-            y: center.y - radius,
+            y: minY,
             z: center.z - radius
         },
         {
             x: center.x + radius,
-            y: center.y + radius,
+            y: maxY,
             z: center.z + radius
         }
     );

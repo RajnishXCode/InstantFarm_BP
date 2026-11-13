@@ -1,40 +1,50 @@
-
 {
   "namespace": "hud",
 
   "ore_radar_panel": {
     "type": "image",
     "texture": "textures/ui/hud_tip_text_background",
-    "size": [220, 112],
+    "size": [224, 108],
     "anchor_from": "top_right",
     "anchor_to": "top_right",
     "offset": [-12, 12],
-    "alpha": 0.9,
+    "alpha": "@hud.anim_actionbar_text_background_alpha_out",
     "layer": 40,
-
     "controls": [
       {
         "radar_title": {
           "type": "label",
-          "text": "ORE RADAR",
-          "font_size": "small",
+          "text": "instantfarm.radar.title",
+          "font_size": "normal",
           "color": "#55FFAA",
           "shadow": true,
           "anchor_from": "top_left",
           "anchor_to": "top_left",
-          "offset": [10, 8]
+          "offset": [10, 7]
+        }
+      },
+      {
+        "radar_status": {
+          "type": "label",
+          "text": "instantfarm.radar.status.scanning",
+          "font_size": "small",
+          "color": "#AAAAAA",
+          "shadow": true,
+          "anchor_from": "top_right",
+          "anchor_to": "top_right",
+          "offset": [-10, 10]
         }
       },
       {
         "radar_separator": {
           "type": "image",
           "texture": "textures/ui/Black",
-          "size": [200, 1],
+          "size": [204, 1],
           "color": "#55FFAA",
           "alpha": 0.8,
           "anchor_from": "top_left",
           "anchor_to": "top_left",
-          "offset": [10, 27]
+          "offset": [10, 29]
         }
       },
       {
@@ -42,39 +52,18 @@
           "type": "label",
           "text": "$actionbar_text",
           "localize": false,
-          "font_size": "small",
+          "font_size": "normal",
           "color": "#FFFFFF",
           "shadow": true,
-          "max_size": [200, 76],
+          "line_padding": 3,
+          "max_size": [204, 68],
           "anchor_from": "top_left",
           "anchor_to": "top_left",
-          "offset": [10, 34]
+          "offset": [10, 37]
         }
       }
     ]
   },
 
-  "ore_radar_factory": {
-    "type": "panel",
-    "factory": {
-      "name": "hud_actionbar_text_factory",
-      "control_ids": {
-        "hud_actionbar_text": "ore_radar_panel@hud.ore_radar_panel"
-      }
-    }
-  },
-
-  "root_panel": {
-    "modifications": [
-      {
-        "array_name": "controls",
-        "operation": "insert_front",
-        "value": [
-          {
-            "ore_radar_factory@hud.ore_radar_factory": {}
-          }
-        ]
-      }
-    ]
-  }
+  "hud_actionbar_text@hud.ore_radar_panel": {}
 }
