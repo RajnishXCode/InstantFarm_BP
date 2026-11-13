@@ -68,7 +68,13 @@ jobs:
 
       - name: Generate Download Page
         run: |
-          cat <<'EOF' > release/index.html
+          DEPLOYED_AT_ISO=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          DEPLOYED_AT=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          ADDON_VERSION=$(node -p "require('./package.json').version")
+          BUILD_COMMIT="${GITHUB_SHA::7}"
+          BUILD_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+
+          cat <<EOF > release/index.html
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -140,6 +146,32 @@ jobs:
                 max-width: 510px;
                 margin: auto;
                 font-size: 15px;
+              }
+
+              .deployment {
+                margin: 0 0 20px;
+                padding: 16px 20px;
+                border: 1px solid #2c3b2d;
+                border-radius: 14px;
+                background: #19251a;
+                color: #a5b3a2;
+                text-align: center;
+                font-size: 13px;
+                line-height: 1.7;
+              }
+
+              .deployment strong {
+                color: #f0f5ed;
+                font-weight: 600;
+              }
+
+              .deployment a {
+                color: #a7d68b;
+                text-decoration: none;
+              }
+
+              .deployment a:hover {
+                text-decoration: underline;
               }
 
               .downloads {
@@ -285,6 +317,18 @@ jobs:
                   Enhance your survival experience with Vanilla+ features.
                   Faster farming, instant tree generation and upcoming
                   quality-of-life enhancements.
+                </p>
+              </section>
+
+              <section class="deployment" aria-label="Deployment information">
+                <p>
+                  Last deployed:
+                  <strong><time datetime="$DEPLOYED_AT_ISO">$DEPLOYED_AT</time></strong>
+                </p>
+                <p>
+                  Version <strong>$ADDON_VERSION</strong>
+                  · Commit <a href="$BUILD_URL" target="_blank" rel="noopener noreferrer">$BUILD_COMMIT</a>
+                  · Build <strong>#$GITHUB_RUN_NUMBER</strong>
                 </p>
               </section>
 
