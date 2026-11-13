@@ -24,6 +24,17 @@
         "item": "minecraft:redstone"
       }
     },
+    "unlock": [
+      {
+        "item": "minecraft:emerald"
+      },
+      {
+        "item": "minecraft:iron_ingot"
+      },
+      {
+        "item": "minecraft:redstone"
+      }
+    ],
     "result": {
       "item": "instantfarm:ore_detector",
       "count": 1
