@@ -1,7 +1,7 @@
 
 # Pack information
 pack.name=Instant Farm RP
-pack.description=Textures and interface for Instant Farm Vanilla+
+pack.description=Ore Detector texture and name for Instant Farm Vanilla+. Craft: Emerald (top and bottom), Iron Ingot (left and right), Diamond (center), crafting table. Hold it in your main hand to scan for ores.
 
 # Custom items
 item.instantfarm:ore_detector.name=Ore Detector

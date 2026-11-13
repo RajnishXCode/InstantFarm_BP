@@ -2,9 +2,9 @@
   "format_version": 2,
   "header": {
     "name": "Instant Farm BP",
-    "description": "Vanilla+ survival enhancements including instant crop growth, instant tree generation and ore detection.",
+    "description": "Vanilla+ survival enhancements: instant crop growth, instant trees and the Ore Detector radar. Craft it with Emerald (top and bottom), Iron Ingot (left and right) and Diamond (center) in a crafting table, then hold it in your main hand to scan for ores.",
     "uuid": "9c662411-f8f1-481d-8ad1-59b71c909d26",
-    "version": [1, 1, 0],
+    "version": [1, 2, 0],
     "min_engine_version": [1, 20, 0]
   },
   "modules": [
@@ -12,7 +12,7 @@
       "type": "script",
       "language": "javascript",
       "uuid": "130f82fa-d7d6-41f8-b938-8be5df941d8a",
-      "version": [1, 1, 0],
+      "version": [1, 2, 0],
       "entry": "scripts/main.js"
     }
   ],
@@ -23,7 +23,7 @@
     },
     {
       "uuid": "7b3a2d91-6f40-4c82-9e15-a8d72b31c604",
-      "version": [1, 1, 0]
+      "version": [1, 2, 0]
     }
   ]
 }

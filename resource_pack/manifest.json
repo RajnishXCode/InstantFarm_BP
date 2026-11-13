@@ -3,16 +3,16 @@
   "format_version": 2,
   "header": {
     "name": "Instant Farm RP",
-    "description": "Textures and interface assets for Instant Farm Vanilla+",
+    "description": "Ore Detector texture and name for Instant Farm Vanilla+. Craft: Emerald (top and bottom), Iron Ingot (left and right), Diamond (center), crafting table.",
     "uuid": "7b3a2d91-6f40-4c82-9e15-a8d72b31c604",
-    "version": [1, 1, 0],
+    "version": [1, 2, 0],
     "min_engine_version": [1, 20, 0]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "f49a2e7c-91b4-47d2-a3c8-6c2b8f1e5d70",
-      "version": [1, 1, 0]
+      "version": [1, 2, 0]
     }
   ]
 }
