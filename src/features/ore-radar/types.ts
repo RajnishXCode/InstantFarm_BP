@@ -3,6 +3,7 @@ import type { Vector3 } from "@minecraft/server";
 
 export interface OreDefinition {
     readonly name: string;
+    readonly symbol: string;
     readonly color: string;
 }
 
@@ -32,6 +33,9 @@ export interface RelativePosition {
     readonly sector: CompassSector;
     readonly distance: number;
     readonly verticalOffset: number;
+    // Horizontal offset in blocks: ahead is positive forward, side is positive to the right.
+    readonly ahead: number;
+    readonly side: number;
 }
 
 export interface RadarEntry {
@@ -43,6 +47,7 @@ export interface RadarEntry {
 export interface RadarView {
     readonly scanned: boolean;
     readonly status: string;
+    readonly facingDegrees: number;
     readonly radius: number;
     readonly totalVeins: number;
     readonly entries: RadarEntry[];

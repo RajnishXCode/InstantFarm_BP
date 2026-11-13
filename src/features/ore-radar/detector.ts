@@ -2,7 +2,7 @@
 import { EquipmentSlot, type Player } from "@minecraft/server";
 
 import { ORE_DEFINITIONS, RADAR_CONFIG } from "./config";
-import { getRelativePosition } from "./direction";
+import { getFacingDegrees, getRelativePosition } from "./direction";
 import { formatRadar } from "./hud";
 import { scanOres } from "./scanner";
 import type { RadarEntry, RadarView, ScanReport } from "./types";
@@ -63,6 +63,7 @@ function buildView(player: Player, session: RadarSession): RadarView {
     return {
         scanned: report !== undefined,
         status,
+        facingDegrees: getFacingDegrees(viewYaw),
         radius: RADAR_CONFIG.scanRadius,
         totalVeins: entries.length,
         entries: shown,

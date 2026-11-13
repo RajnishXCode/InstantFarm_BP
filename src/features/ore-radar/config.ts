@@ -31,43 +31,43 @@ export const RADAR_CONFIG = {
     // Ore blocks within this distance of each other belong to one vein.
     veinLinkDistance: 2,
 
-    // Maximum number of veins shown on the radar.
-    maxResults: 5,
+    // Maximum number of veins listed under the radar grid.
+    maxResults: 3,
 
     // Side length of a block-query cube. Matches Bedrock subchunks.
     chunkSize: 16
 } as const;
 
 export const ORE_DEFINITIONS: Readonly<Record<string, OreDefinition>> = {
-    "minecraft:coal_ore": { name: "Coal", color: "§8" },
-    "minecraft:deepslate_coal_ore": { name: "Coal", color: "§8" },
+    "minecraft:coal_ore": { name: "Coal", symbol: "C", color: "§8" },
+    "minecraft:deepslate_coal_ore": { name: "Coal", symbol: "C", color: "§8" },
 
-    "minecraft:iron_ore": { name: "Iron", color: "§7" },
-    "minecraft:deepslate_iron_ore": { name: "Iron", color: "§7" },
+    "minecraft:iron_ore": { name: "Iron", symbol: "I", color: "§7" },
+    "minecraft:deepslate_iron_ore": { name: "Iron", symbol: "I", color: "§7" },
 
-    "minecraft:copper_ore": { name: "Copper", color: "§3" },
-    "minecraft:deepslate_copper_ore": { name: "Copper", color: "§3" },
+    "minecraft:copper_ore": { name: "Copper", symbol: "U", color: "§3" },
+    "minecraft:deepslate_copper_ore": { name: "Copper", symbol: "U", color: "§3" },
 
-    "minecraft:gold_ore": { name: "Gold", color: "§e" },
-    "minecraft:deepslate_gold_ore": { name: "Gold", color: "§e" },
+    "minecraft:gold_ore": { name: "Gold", symbol: "G", color: "§e" },
+    "minecraft:deepslate_gold_ore": { name: "Gold", symbol: "G", color: "§e" },
 
-    "minecraft:redstone_ore": { name: "Redstone", color: "§4" },
-    "minecraft:lit_redstone_ore": { name: "Redstone", color: "§4" },
-    "minecraft:deepslate_redstone_ore": { name: "Redstone", color: "§4" },
-    "minecraft:lit_deepslate_redstone_ore": { name: "Redstone", color: "§4" },
+    "minecraft:redstone_ore": { name: "Redstone", symbol: "R", color: "§4" },
+    "minecraft:lit_redstone_ore": { name: "Redstone", symbol: "R", color: "§4" },
+    "minecraft:deepslate_redstone_ore": { name: "Redstone", symbol: "R", color: "§4" },
+    "minecraft:lit_deepslate_redstone_ore": { name: "Redstone", symbol: "R", color: "§4" },
 
-    "minecraft:lapis_ore": { name: "Lapis", color: "§9" },
-    "minecraft:deepslate_lapis_ore": { name: "Lapis", color: "§9" },
+    "minecraft:lapis_ore": { name: "Lapis", symbol: "L", color: "§9" },
+    "minecraft:deepslate_lapis_ore": { name: "Lapis", symbol: "L", color: "§9" },
 
-    "minecraft:diamond_ore": { name: "Diamond", color: "§b" },
-    "minecraft:deepslate_diamond_ore": { name: "Diamond", color: "§b" },
+    "minecraft:diamond_ore": { name: "Diamond", symbol: "D", color: "§b" },
+    "minecraft:deepslate_diamond_ore": { name: "Diamond", symbol: "D", color: "§b" },
 
-    "minecraft:emerald_ore": { name: "Emerald", color: "§a" },
-    "minecraft:deepslate_emerald_ore": { name: "Emerald", color: "§a" },
+    "minecraft:emerald_ore": { name: "Emerald", symbol: "E", color: "§a" },
+    "minecraft:deepslate_emerald_ore": { name: "Emerald", symbol: "E", color: "§a" },
 
-    "minecraft:nether_gold_ore": { name: "Nether Gold", color: "§6" },
-    "minecraft:quartz_ore": { name: "Nether Quartz", color: "§f" },
-    "minecraft:ancient_debris": { name: "Ancient Debris", color: "§5" }
+    "minecraft:nether_gold_ore": { name: "Nether Gold", symbol: "N", color: "§6" },
+    "minecraft:quartz_ore": { name: "Nether Quartz", symbol: "Q", color: "§f" },
+    "minecraft:ancient_debris": { name: "Ancient Debris", symbol: "A", color: "§5" }
 };
 
 export const ORE_BLOCK_IDS: string[] = Object.keys(ORE_DEFINITIONS);

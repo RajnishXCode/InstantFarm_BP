@@ -14,8 +14,9 @@ This project is written in TypeScript and bundled into a Minecraft script module
   - Supports the default tree variants included in the feature configuration.
 - Ore Sectors Radar
   - Holding the Ore Detector in your main hand shows the radar in the actionbar above the hotbar. Switching to another item hides it.
+  - The radar shows your facing direction as a heading in degrees, a compass tape with the current direction in brackets, and a top-down grid with you at the center and forward at the top. Ores appear in their real direction.
   - Scans a 32-block radius every second for coal, iron, copper, gold, redstone, lapis, diamond, emerald, nether gold, nether quartz and ancient debris, including deepslate variants.
-  - Lists up to five ore veins sorted by distance, each with its ore type, distance, direction relative to where you are facing, and vertical offset.
+  - Lists the three nearest ore veins sorted by distance, each with its distance, a plain-language direction (ahead, behind-left, right, and so on) and vertical offset.
   - Direction and distance update as you move or turn, without rescanning.
 
 ## Project structure

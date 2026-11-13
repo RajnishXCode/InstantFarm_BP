@@ -3,8 +3,10 @@ import type { Vector3 } from "@minecraft/server";
 
 import type { CompassSector, RelativePosition } from "./types";
 
-// Ordered clockwise from straight ahead of the player's view.
-const SECTORS: readonly CompassSector[] = [
+type CardinalName = Exclude<CompassSector, "CTR">;
+
+// Ordered clockwise from north, which is the compass heading of index 0.
+export const CARDINALS: readonly CardinalName[] = [
     "N",
     "NE",
     "E",
@@ -16,6 +18,19 @@ const SECTORS: readonly CompassSector[] = [
 ];
 
 const CENTER_THRESHOLD = 1;
+
+/**
+ * Compass heading the player is facing, in degrees clockwise from north.
+ * Minecraft yaw is 0 when facing south, so the heading is yaw + 180.
+ */
+export function getFacingDegrees(viewYawDegrees: number): number {
+    return ((viewYawDegrees + 180) % 360 + 360) % 360;
+}
+
+/** Index into CARDINALS for a heading, wrapping at 360 degrees. */
+export function getCardinalIndex(degrees: number): number {
+    return Math.round(degrees / 45) % CARDINALS.length;
+}
 
 /**
  * Describes a target relative to the player's view. Sectors are measured
@@ -41,10 +56,6 @@ export function getRelativePosition(
     // Whole-block level difference: +4 means the ore is four block layers above the player's feet.
     const verticalOffset = target.y - Math.floor(origin.y);
 
-    if (horizontal < CENTER_THRESHOLD) {
-        return { sector: "CTR", distance, verticalOffset };
-    }
-
     const yaw = viewYawDegrees * Math.PI / 180;
 
     const forwardX = -Math.sin(yaw);
@@ -53,11 +64,15 @@ export function getRelativePosition(
     const rightX = -Math.cos(yaw);
     const rightZ = -Math.sin(yaw);
 
-    const forward = dx * forwardX + dz * forwardZ;
-    const right = dx * rightX + dz * rightZ;
+    const ahead = dx * forwardX + dz * forwardZ;
+    const side = dx * rightX + dz * rightZ;
 
-    const degrees = (Math.atan2(right, forward) * 180 / Math.PI + 360) % 360;
-    const sector = SECTORS[Math.round(degrees / 45) % SECTORS.length];
+    if (horizontal < CENTER_THRESHOLD) {
+        return { sector: "CTR", distance, verticalOffset, ahead, side };
+    }
 
-    return { sector, distance, verticalOffset };
+    const degrees = (Math.atan2(side, ahead) * 180 / Math.PI + 360) % 360;
+    const sector = CARDINALS[Math.round(degrees / 45) % CARDINALS.length];
+
+    return { sector, distance, verticalOffset, ahead, side };
 }
